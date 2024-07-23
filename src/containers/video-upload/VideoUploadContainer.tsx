@@ -9,6 +9,12 @@ function VideoUploadContainer() {
       <SubTitle />
       <SubTitle />
       <SubTitle />
+      <SubTitle />
+      <SubTitle />
+      <SubTitle />
+      <SubTitle />
+      <SubTitle />
+      <SubTitle />
     </>
   );
 }

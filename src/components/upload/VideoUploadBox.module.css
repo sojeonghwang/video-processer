@@ -5,7 +5,10 @@
   display: block;
   cursor: pointer;
   text-align: center;
-  line-height: 300px;
+  display: flex;
+  align-content: center;
+  align-items: center;
+  justify-content: center;
   &:hover {
     background: #f8f8f8;
   }
@@ -24,4 +27,8 @@
   &:hover {
     background: rgb(188 229 137);
   }
+}
+
+.description {
+  margin-top: 27px;
 }

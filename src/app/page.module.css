@@ -1,4 +1,14 @@
 .wrap {
   position: relative;
-  padding: 10px;
+}
+
+.contents {
+  position: fixed;
+  padding: 0 10px;
+  width: calc(100% - 20px);
+  height: 100%;
+  height: calc(100% - 146px);
+  overflow-y: scroll;
+  top: 32px;
+  bottom: 90px;
 }
