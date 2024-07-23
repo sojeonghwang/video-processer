@@ -1,0 +1,9 @@
+.wrap {
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px #f8f8f8 solid;
+  /* background: #f8f8f8; */
+  border-radius: 4px;
+  line-height: 25px;
+  font-size: 14px;
+}

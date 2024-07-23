@@ -9,7 +9,7 @@ function VideoUploadBox() {
         type="file"
         accept="video/mp4, video/mov"
       />
-      <span>파일 업로드</span>
+      <span className={styled.fake_button}>video file upload</span>
     </label>
   );
 }
