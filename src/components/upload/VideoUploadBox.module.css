@@ -1,0 +1,13 @@
+.wrap {
+  border-radius: 20px;
+  border: 1px dashed rgb(225, 225, 227);
+  height: 300px;
+  display: block;
+  cursor: pointer;
+  text-align: center;
+  line-height: 300px;
+}
+
+.hide_input {
+  display: none;
+}
