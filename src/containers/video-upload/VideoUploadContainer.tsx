@@ -2,11 +2,29 @@
 import SubTitle from "@/components/subtitle/Subtitle";
 import VideoUploadBox from "@/components/upload/VideoUploadBox";
 import { VIDEO_VALIDATION } from "@/constants/video";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useMemo, useRef, useState } from "react";
 import styled from "./videoUploadContainer.module.css";
+import Loading from "@/components/common/Loading";
 
 function VideoUploadContainer() {
-  const [isVideoLoad, setIsVideoLoad] = useState<boolean>(true);
+  const [isVideoLoad, setIsVideoLoad] = useState<boolean>(false);
+  const [videoSrc, setVideoSrc] = useState<null | string>(null);
+  const videoRef = useRef<null | HTMLVideoElement>(null);
+
+  const handleCheckDuration = () => {
+    const duration =
+      videoRef.current?.duration ?? VIDEO_VALIDATION.limitDuration + 1;
+    if (duration > VIDEO_VALIDATION.limitDuration) {
+      alert(
+        `업로드 가능한 비디오 시간은 ${VIDEO_VALIDATION.limitDurationLabel}입니다.`
+      );
+      return;
+    }
+
+    setIsVideoLoad(false);
+    // @todo codec 체크 로직 ffmpeg 확인해서 넣을지 말지 결정하기
+  };
+
   const handleValidateSizeAndCount = (files: FileList | null) => {
     if (!files || files?.length > 1) {
       // @todo 얼럿 노티 처리
@@ -15,7 +33,6 @@ function VideoUploadContainer() {
     }
 
     const file = files?.[0];
-    console.log("file.size", file.size);
     if (file.size > VIDEO_VALIDATION.limitSize) {
       // @todo 얼럿 노티 처리
       alert(
@@ -24,12 +41,15 @@ function VideoUploadContainer() {
       return;
     }
 
+    console.log("file.type", file.type);
     if (!VIDEO_VALIDATION.type.includes(file.type)) {
       alert("지원하지 않는 확장자 입니다.");
       return;
     }
 
-    console.log("file", file);
+    const videoUrl = URL.createObjectURL(file);
+    setVideoSrc(videoUrl);
+    setIsVideoLoad(true);
   };
 
   const handleValidateSizeVideoByDropEvent = (
@@ -46,20 +66,48 @@ function VideoUploadContainer() {
     handleValidateSizeAndCount(files);
   };
 
-  return (
-    <>
-      {!isVideoLoad ? (
+  const Preview = useMemo(() => {
+    const isUploadPreviewShow = !isVideoLoad && !videoSrc;
+    if (isUploadPreviewShow) {
+      return (
         <VideoUploadBox
           onChange={handleValidateSizeVideoByChangeEvent}
           onDrop={handleValidateSizeVideoByDropEvent}
         />
-      ) : (
-        <div className={styled.wrap}>
-          <div className={styled.cover}></div>
-          <video src="" />
-        </div>
-      )}
+      );
+    }
 
+    return (
+      <div className={styled.wrap}>
+        {isVideoLoad && (
+          <div className={styled.cover}>
+            <Loading />
+          </div>
+        )}
+        {!!videoSrc && (
+          <video
+            ref={videoRef}
+            className={styled.video}
+            style={{
+              visibility: "visible",
+            }}
+            onLoadedMetadata={handleCheckDuration}
+            src={videoSrc}
+          />
+        )}
+      </div>
+    );
+  }, [
+    isVideoLoad,
+    handleValidateSizeVideoByChangeEvent,
+    handleValidateSizeVideoByDropEvent,
+    videoSrc,
+    handleCheckDuration,
+  ]);
+
+  return (
+    <>
+      {Preview}
       <SubTitle />
       <SubTitle />
       <SubTitle />
