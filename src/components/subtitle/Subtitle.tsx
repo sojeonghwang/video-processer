@@ -1,12 +1,8 @@
+import { PropsWithChildren } from "react";
 import styled from "./subtitle.module.css";
 
-function SubTitle() {
-  return (
-    <div className={styled.wrap}>
-      자막이에요 이건 자막입니다.자막이에요 이건 자막입니다.자막이에요 이건
-      자막입니다.자막이에요 이건 자막입니다.자막이에요 이건 자막입니다.
-    </div>
-  );
+function SubTitle({ children }: PropsWithChildren) {
+  return <div className={styled.wrap}>{children}</div>;
 }
 
 export default SubTitle;
