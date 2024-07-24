@@ -1,0 +1,11 @@
+.wrap {
+  position: relative;
+  height: 302px;
+}
+
+.cover {
+  width: 100%;
+  position: absolute;
+  height: 302px;
+  background: red;
+}
