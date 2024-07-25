@@ -1,5 +1,6 @@
 export const maxDuration = 30;
 import fs from "fs";
+import path from "path";
 
 export async function POST(req: Request) {
   const formData = await req.formData();
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
       ) as unknown as Uint8Array;
 
       fileName = file?.name;
-      fileUrl = `src/app/api/video-processor/input/${fileName}`;
+      fileUrl = path.join(__dirname, "input" + fileName);
       fs.writeFileSync(fileUrl, buffer);
     }
   }

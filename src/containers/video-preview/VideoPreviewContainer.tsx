@@ -92,6 +92,7 @@ function VideoUploadContainer() {
       }
     } catch (exception) {
       handleInitVideoState();
+      alert("서버와 통신에 실패했습니다.");
       console.error(`[handleUploadMp3] - ${exception}`);
     }
   };
