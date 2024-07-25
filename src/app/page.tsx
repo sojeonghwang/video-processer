@@ -11,6 +11,7 @@ export default function Home() {
       <div className={styled.contents}>
         <VideoUploadContainer />
       </div>
+      {/* @todo 전역 store video 정보 없는 경우 렌더링 제외 하기 */}
       <PlayerContainer />
     </div>
   );
