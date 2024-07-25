@@ -11,23 +11,7 @@ import { useMemo } from "react";
 import { changeSecondToMinute } from "@/utils/time";
 
 function PlayerContainer() {
-  const { video } = videoStore();
-
-  const handleChangeVideoCurrentTimeAtFirst = () => {
-    // @todo 처음으로 가기 처리
-  };
-
-  const handleChangeVideoCurrentTimeAtLast = () => {
-    // @todo 마지막으로 가기 처리
-  };
-
-  const handleTogglePlayVideo = () => {
-    // @todo 재생, 정ㅣ 로직
-  };
-
-  const handleToggleIsMute = () => {
-    // @todo 소리 처리
-  };
+  const { video, setCurrentTime, setMute, setIsPlaying } = videoStore();
 
   const VideoPlayTime = useMemo(() => {
     if (!video?.currentTime || !video?.duration) {
@@ -45,13 +29,13 @@ function PlayerContainer() {
     if (video?.isPlaying) {
       return (
         <InitButton>
-          <FaPause size={25} />
+          <FaPause size={25} onClick={() => setIsPlaying(true)} />
         </InitButton>
       );
     }
     return (
       <InitButton>
-        <FaPlay size={20} />
+        <FaPlay size={20} onClick={() => setIsPlaying(false)} />
       </InitButton>
     );
   }, [video?.isPlaying]);
@@ -59,17 +43,17 @@ function PlayerContainer() {
   const SoundIcon = useMemo(() => {
     if (video?.isMute) {
       return (
-        <InitButton>
+        <InitButton onClick={() => setMute(true)}>
           <ImVolumeMute2 />
         </InitButton>
       );
     }
     return (
-      <InitButton>
+      <InitButton onClick={() => setMute(true)}>
         <ImVolumeMute size={25} />
       </InitButton>
     );
-  }, [video?.isMute]);
+  }, [video?.isMute, setMute]);
 
   return (
     <div className={styled.wrap}>
@@ -79,11 +63,11 @@ function PlayerContainer() {
       <div className={styled.video_control}>
         {VideoPlayTime}
         <span className={styled.play_control}>
-          <InitButton>
+          <InitButton onClick={() => setCurrentTime(0)}>
             <IoPlaySkipBackSharp size={25} />
           </InitButton>
           {PlayIcon}
-          <InitButton>
+          <InitButton onClick={() => setCurrentTime(video?.duration ?? 0)}>
             <IoPlaySkipForward size={25} />
           </InitButton>
         </span>
