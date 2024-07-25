@@ -13,8 +13,10 @@ export async function POST(req: Request) {
       typeof formDataEntryValue === "object" &&
       "arrayBuffer" in formDataEntryValue
     ) {
-      const file = formDataEntryValue as unknown as Blob;
-      const buffer = Buffer.from(await file.arrayBuffer());
+      const file = formDataEntryValue;
+      const buffer = Buffer.from(
+        await file.arrayBuffer()
+      ) as unknown as Uint8Array;
 
       fileName = file?.name;
       fileUrl = `src/app/api/video-processor/input/${fileName}`;
@@ -22,6 +24,7 @@ export async function POST(req: Request) {
     }
   }
 
+  // @ts-expect-error @todo 타입에러 확인 후 수정 필요
   const res = await fetch(
     "https://naveropenapi.apigw.ntruss.com/recog/v1/stt?lang=Kor",
     {
