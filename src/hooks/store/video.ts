@@ -76,6 +76,7 @@ const videoStore = create<VideoState & VideoAction>((set) => ({
         duration = 0,
         currentTime = 0,
       } = state.video ?? {};
+
       return {
         video: {
           duration,

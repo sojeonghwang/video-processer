@@ -244,6 +244,7 @@ function VideoUploadContainer() {
 
       if (!video?.isPlaying && typeof video?.currentTime !== "undefined") {
         videoRef.current.currentTime = video.currentTime;
+        videoRef.current.pause();
       }
     },
     [videoRef?.current, video?.isPlaying, video?.currentTime]

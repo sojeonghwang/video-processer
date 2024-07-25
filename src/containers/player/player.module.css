@@ -15,7 +15,7 @@
 }
 
 .duration {
-  width: 20%;
+  width: 0;
   display: inline-block;
   height: 10px;
   background: rgb(182 231 123);
