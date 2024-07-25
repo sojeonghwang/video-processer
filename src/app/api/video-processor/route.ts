@@ -20,7 +20,7 @@ export async function POST(req: Request) {
       ) as unknown as Uint8Array;
 
       fileName = file?.name;
-      fileUrl = path.join(__dirname, "/" + fileName);
+      fileUrl = path.join("/tmp", fileName);
       fs.writeFileSync(fileUrl, buffer);
     }
   }
