@@ -13,14 +13,24 @@ import { changeSecondToMinute } from "@/utils/time";
 function PlayerContainer() {
   const { video, setCurrentTime, setMute, setIsPlaying } = videoStore();
 
+  const handleChangeCurrnetTime = (isFirst: boolean) => {
+    setIsPlaying(false);
+    if (isFirst) {
+      setCurrentTime(0);
+      return;
+    }
+    setCurrentTime(video?.duration ?? 0);
+  };
+
   const VideoPlayTime = useMemo(() => {
-    if (!video?.currentTime || !video?.duration) {
+    if (!video?.duration) {
       return <span>00:00/00:00</span>;
     }
     return (
       <span>
-        `${changeSecondToMinute(video.currentTime)}:$
-        {changeSecondToMinute(video.duration)}`
+        {`${changeSecondToMinute(video.currentTime)}/${changeSecondToMinute(
+          video.duration
+        )}`}
       </span>
     );
   }, [video?.currentTime, video?.duration]);
@@ -29,13 +39,13 @@ function PlayerContainer() {
     if (video?.isPlaying) {
       return (
         <InitButton>
-          <FaPause size={25} onClick={() => setIsPlaying(true)} />
+          <FaPause size={25} onClick={() => setIsPlaying(false)} />
         </InitButton>
       );
     }
     return (
       <InitButton>
-        <FaPlay size={20} onClick={() => setIsPlaying(false)} />
+        <FaPlay size={20} onClick={() => setIsPlaying(true)} />
       </InitButton>
     );
   }, [video?.isPlaying]);
@@ -43,8 +53,8 @@ function PlayerContainer() {
   const SoundIcon = useMemo(() => {
     if (video?.isMute) {
       return (
-        <InitButton onClick={() => setMute(true)}>
-          <ImVolumeMute2 />
+        <InitButton onClick={() => setMute(false)}>
+          <ImVolumeMute2 size={25} />
         </InitButton>
       );
     }
@@ -63,11 +73,11 @@ function PlayerContainer() {
       <div className={styled.video_control}>
         {VideoPlayTime}
         <span className={styled.play_control}>
-          <InitButton onClick={() => setCurrentTime(0)}>
+          <InitButton onClick={() => handleChangeCurrnetTime(true)}>
             <IoPlaySkipBackSharp size={25} />
           </InitButton>
           {PlayIcon}
-          <InitButton onClick={() => setCurrentTime(video?.duration ?? 0)}>
+          <InitButton onClick={() => handleChangeCurrnetTime(false)}>
             <IoPlaySkipForward size={25} />
           </InitButton>
         </span>

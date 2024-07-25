@@ -54,8 +54,6 @@ const videoStore = create<VideoState & VideoAction>((set) => ({
   },
   setCurrentTime: (currentTime: number) => {
     set((state) => {
-      //정지 후 currentTime 변경
-      state.setIsPlaying(false);
       const {
         isMute = false,
         duration = 0,

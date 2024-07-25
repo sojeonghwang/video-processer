@@ -2,13 +2,15 @@
 import SubTitle from "@/components/subtitle/Subtitle";
 import VideoUploadBox from "@/components/upload/VideoUploadBox";
 import { VIDEO_VALIDATION } from "@/constants/video";
-import { ChangeEvent, useMemo, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import styled from "./videoPreviewContainer.module.css";
 import Loading from "@/components/common/Loading";
+import videoStore from "@/hooks/store/video";
 const { createFFmpeg, fetchFile } = require("@ffmpeg/ffmpeg");
 
 // @todo any 고치고, 비디오 업로드 안내 문구 한국어만 된다고 적기, 최대 60초로 변경, ffmpeg package json 필요 없는 것 정리
 function VideoUploadContainer() {
+  const { video, setVideo, setCurrentTime } = videoStore();
   const [isVideoLoad, setIsVideoLoad] = useState<boolean>(false);
   const [videoSrc, setVideoSrc] = useState<null | string>(null);
   // @todo any 고치기
@@ -23,6 +25,10 @@ function VideoUploadContainer() {
     setSubTitle([]);
     setVideoSrc(null);
     setIsVideoLoad(false);
+  };
+
+  const handleUploadVideoCurrentTime = () => {
+    setCurrentTime(videoRef.current?.currentTime ?? 0);
   };
 
   const handleChangeMp4ToMp3 = async () => {
@@ -64,6 +70,13 @@ function VideoUploadContainer() {
       if (!!data?.data?.length) {
         setSubTitle(data.data);
         setIsVideoLoad(false);
+
+        setVideo({
+          duration: videoRef.current?.duration ?? 0,
+          currentTime: 0,
+          isPlaying: false,
+          isMute: false,
+        });
       }
     } catch (exception) {
       initVideoState();
@@ -178,6 +191,7 @@ function VideoUploadContainer() {
         )}
         {!!videoSrc && (
           <video
+            onTimeUpdate={handleUploadVideoCurrentTime}
             ref={videoRef}
             className={styled.video}
             style={{
@@ -208,11 +222,47 @@ function VideoUploadContainer() {
     });
   }, [subTitle]);
 
+  useEffect(
+    function toggleVideoPlay() {
+      if (!videoRef.current) {
+        return;
+      }
+      if (video?.isPlaying) {
+        videoRef.current.play();
+      } else {
+        videoRef.current.pause();
+      }
+    },
+    [videoRef?.current, video?.isPlaying, video?.currentTime]
+  );
+
+  useEffect(
+    function setCurrentTimeAtPause() {
+      if (!videoRef.current) {
+        return;
+      }
+
+      if (!video?.isPlaying && typeof video?.currentTime !== "undefined") {
+        videoRef.current.currentTime = video.currentTime;
+      }
+    },
+    [videoRef?.current, video?.isPlaying, video?.currentTime]
+  );
+
+  useEffect(
+    function setMute() {
+      if (!videoRef.current) {
+        return;
+      }
+      videoRef.current.muted = video?.isMute ?? false;
+    },
+    [videoRef?.current, video?.isMute]
+  );
+
   return (
     <>
       {Preview}
       {SubTitleList}
-      {/* <img src={url} /> */}
     </>
   );
 }
