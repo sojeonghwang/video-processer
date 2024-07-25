@@ -3,7 +3,7 @@ import SubTitle from "@/components/subtitle/Subtitle";
 import VideoUploadBox from "@/components/upload/VideoUploadBox";
 import { VIDEO_VALIDATION } from "@/constants/video";
 import { ChangeEvent, useMemo, useRef, useState } from "react";
-import styled from "./videoUploadContainer.module.css";
+import styled from "./videoPreviewContainer.module.css";
 import Loading from "@/components/common/Loading";
 const { createFFmpeg, fetchFile } = require("@ffmpeg/ffmpeg");
 
