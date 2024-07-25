@@ -8,6 +8,7 @@
   position: absolute;
   height: 302px;
   display: flex;
+  z-index: 1;
   align-items: center;
   justify-content: center;
   background: rgb(248 248 248);
