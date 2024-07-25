@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useMemo, useState } from "react";
 import styled from "./VideoUploadBox.module.css";
 import { VIDEO_VALIDATION } from "@/constants/video";
 
@@ -22,6 +22,10 @@ function VideoUploadBox({ onChange, onDrop }: VideoUploadBoxInterface) {
     setIsEnteredFile(true);
   };
 
+  const accept = useMemo(() => {
+    return VIDEO_VALIDATION.type.join(",");
+  }, [VIDEO_VALIDATION]);
+
   return (
     <label
       style={{
@@ -38,12 +42,13 @@ function VideoUploadBox({ onChange, onDrop }: VideoUploadBoxInterface) {
     >
       {/* @todo 이벤트 캡쳐링 안되는거 확인하기 */}
       <span>
+        {/* @todo constants 값으로 바꾸기 */}
         <input
           onChange={onChange}
           className={styled.hide_input}
           id="upload"
           type="file"
-          accept="video/mp4, video/mov"
+          accept={accept}
         />
         <span className={styled.fake_button}>video file upload</span>
         <p className={styled.description}>
@@ -52,6 +57,8 @@ function VideoUploadBox({ onChange, onDrop }: VideoUploadBoxInterface) {
           <br />
           {VIDEO_VALIDATION.limitDurationLabel} 이하,{" "}
           {VIDEO_VALIDATION.limitSizeLabel} 이하 동영상만 업로드 가능합니다.
+          <br />
+          지원 가능한 언어는 한국어 입니다.
         </p>
       </span>
     </label>

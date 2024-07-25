@@ -41,7 +41,7 @@ export async function POST(req: Request) {
   // 임시로 작성된 파일 제거
   fs.unlink(fileUrl, (err) => {
     if (err) {
-      console.log(`${fileUrl} 제거 실패 수정 제거 요망`);
+      console.log(`${fileUrl} 제거 실패 수동 제거 요망`);
     }
   });
 

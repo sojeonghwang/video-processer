@@ -5,6 +5,14 @@ import { ImVolumeMute, ImVolumeMute2 } from "react-icons/im";
 import InitButton from "@/components/common/InitButton";
 
 function PlayerContainer() {
+  const handleTogglePlayVideo = () => {
+    // @todo 재생, 정ㅣ 로직
+  };
+
+  const handleToggleIsMute = () => {
+    // @todo 소리 처리
+  };
+
   return (
     <div className={styled.wrap}>
       <div className={styled.duration_wrap}>
