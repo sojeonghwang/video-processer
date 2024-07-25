@@ -14,6 +14,16 @@ function PlayerContainer() {
   const { video, setCurrentTime, setMute, setIsPlaying } = videoStore();
   const previousTimeRef = useRef<number | null>(null);
 
+  const draw = (progress: number) => {
+    if (!document.getElementById("progress")) {
+      return;
+    }
+    const progressElement = document.getElementById(
+      "progress"
+    ) as HTMLSpanElement;
+    progressElement.style.width = progress * 100 + "%";
+  };
+
   const handleChangeCurrnetTime = (isFirst: boolean) => {
     setIsPlaying(false);
     const duration = video?.duration ?? 0;
@@ -40,6 +50,16 @@ function PlayerContainer() {
     );
   }, [video?.currentTime, video?.duration]);
 
+  const handlePlayVideo = () => {
+    const duration = video?.duration ?? 0;
+    const currentTime = video?.currentTime ?? 0;
+    if (duration <= currentTime) {
+      draw(0);
+      setCurrentTime(0);
+    }
+    setIsPlaying(true);
+  };
+
   const PlayIcon = useMemo(() => {
     if (video?.isPlaying) {
       return (
@@ -50,7 +70,7 @@ function PlayerContainer() {
     }
     return (
       <InitButton>
-        <FaPlay size={20} onClick={() => setIsPlaying(true)} />
+        <FaPlay size={20} onClick={handlePlayVideo} />
       </InitButton>
     );
   }, [video?.isPlaying]);
@@ -69,13 +89,6 @@ function PlayerContainer() {
       </InitButton>
     );
   }, [video?.isMute, setMute]);
-
-  const draw = (progress: number) => {
-    if (!document.getElementById("progress")) {
-      return;
-    }
-    document.getElementById("progress").style.width = progress * 100 + "%";
-  };
 
   const animate = ({
     draw,
@@ -132,6 +145,10 @@ function PlayerContainer() {
       previousTimeRef.current = null;
     };
   }, []);
+
+  if (!video) {
+    return <></>;
+  }
 
   return (
     <div className={styled.wrap}>

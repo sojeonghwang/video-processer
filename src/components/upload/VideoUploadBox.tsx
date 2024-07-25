@@ -40,9 +40,7 @@ function VideoUploadBox({ onChange, onDrop }: VideoUploadBoxInterface) {
       className={styled.wrap}
       htmlFor="upload"
     >
-      {/* @todo 이벤트 캡쳐링 안되는거 확인하기 */}
       <span>
-        {/* @todo constants 값으로 바꾸기 */}
         <input
           onChange={onChange}
           className={styled.hide_input}

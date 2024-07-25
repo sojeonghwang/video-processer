@@ -77,10 +77,16 @@ const videoStore = create<VideoState & VideoAction>((set) => ({
         currentTime = 0,
       } = state.video ?? {};
 
+      let videoCurrentTime = currentTime;
+
+      if (currentTime >= duration) {
+        videoCurrentTime = 0;
+      }
+
       return {
         video: {
           duration,
-          currentTime,
+          currentTime: videoCurrentTime,
           isPlaying,
           isMute,
         },

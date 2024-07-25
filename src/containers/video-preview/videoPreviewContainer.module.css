@@ -20,3 +20,13 @@
   visibility: hidden;
   width: 100%;
 }
+
+.delete_button {
+  position: absolute;
+  right: 10px;
+  background: #ccc;
+  color: #fff;
+  padding: 5px;
+  bottom: 0;
+  border-radius: 4px;
+}

@@ -6,18 +6,23 @@ import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import styled from "./videoPreviewContainer.module.css";
 import Loading from "@/components/common/Loading";
 import videoStore from "@/hooks/store/video";
+import InitButton from "@/components/common/InitButton";
 const { createFFmpeg, fetchFile } = require("@ffmpeg/ffmpeg");
 
-// @todo any 고치고, 비디오 업로드 안내 문구 한국어만 된다고 적기, 최대 60초로 변경, ffmpeg package json 필요 없는 것 정리
+interface SubTitleInterface {
+  text: string;
+  id: number;
+}
+
 function VideoUploadContainer() {
-  const { video, setVideo, setCurrentTime } = videoStore();
+  const { video, setVideo, setCurrentTime, setIsPlaying, initVideo } =
+    videoStore();
   const [isVideoLoad, setIsVideoLoad] = useState<boolean>(false);
   const [videoSrc, setVideoSrc] = useState<null | string>(null);
-  // @todo any 고치기
-  const [subTitle, setSubTitle] = useState<any[]>([]);
+  const [subTitle, setSubTitle] = useState<SubTitleInterface[]>([]);
   const videoRef = useRef<null | HTMLVideoElement>(null);
 
-  const initVideoState = () => {
+  const handleInitVideoState = () => {
     if (!!videoSrc) {
       //url 메모리 제거
       URL.revokeObjectURL(videoSrc);
@@ -28,7 +33,14 @@ function VideoUploadContainer() {
   };
 
   const handleUploadVideoCurrentTime = () => {
-    setCurrentTime(videoRef.current?.currentTime ?? 0);
+    const currentTime = videoRef.current?.currentTime ?? 0;
+    const duration = videoRef.current?.duration ?? 0;
+
+    setCurrentTime(currentTime);
+
+    if (currentTime >= duration) {
+      setIsPlaying(false);
+    }
   };
 
   const handleChangeMp4ToMp3 = async () => {
@@ -53,7 +65,7 @@ function VideoUploadContainer() {
   const handleUploadMp3 = async (audioFile: File) => {
     try {
       if (!audioFile) {
-        initVideoState();
+        handleInitVideoState();
         alert("오디오 추출에 실패했습니다. 다시 시도해주세요.");
         return;
       }
@@ -79,7 +91,7 @@ function VideoUploadContainer() {
         });
       }
     } catch (exception) {
-      initVideoState();
+      handleInitVideoState();
       console.error(`[handleUploadMp3] - ${exception}`);
     }
   };
@@ -112,6 +124,11 @@ function VideoUploadContainer() {
   //   });
   // };
 
+  const handleRemoveVidep = () => {
+    handleInitVideoState();
+    initVideo();
+  };
+
   const handleCheckDuration = () => {
     const duration =
       videoRef.current?.duration ?? VIDEO_VALIDATION.limitDuration + 1;
@@ -122,7 +139,7 @@ function VideoUploadContainer() {
       return;
     }
 
-    initVideoState();
+    handleInitVideoState();
 
     if (!videoRef.current) {
       return;
@@ -133,14 +150,12 @@ function VideoUploadContainer() {
 
   const handleValidateSizeAndCount = (files: FileList | null) => {
     if (!files || files?.length > 1) {
-      // @todo 얼럿 노티 처리
       alert("하나의 비디오만 업로드 가능합니다.");
       return;
     }
 
     const file = files?.[0];
     if (file.size > VIDEO_VALIDATION.limitSize) {
-      // @todo 얼럿 노티 처리
       alert(
         `업로드 가능한 비디오 용량은 최대 ${VIDEO_VALIDATION.limitSizeLabel}입니다.`
       );
@@ -190,16 +205,25 @@ function VideoUploadContainer() {
           </div>
         )}
         {!!videoSrc && (
-          <video
-            onTimeUpdate={handleUploadVideoCurrentTime}
-            ref={videoRef}
-            className={styled.video}
-            style={{
-              visibility: "visible",
-            }}
-            onLoadedMetadata={handleChangeMp4ToMp3}
-            src={videoSrc}
-          />
+          <div>
+            <video
+              loop={false}
+              onTimeUpdate={handleUploadVideoCurrentTime}
+              ref={videoRef}
+              className={styled.video}
+              style={{
+                visibility: "visible",
+              }}
+              onLoadedMetadata={handleChangeMp4ToMp3}
+              src={videoSrc}
+            />
+            <InitButton
+              className={styled.delete_button}
+              onClick={handleRemoveVidep}
+            >
+              비디오 삭제
+            </InitButton>
+          </div>
         )}
       </div>
     );
@@ -212,8 +236,7 @@ function VideoUploadContainer() {
   ]);
 
   const SubTitleList = useMemo(() => {
-    // @todo any 고치기
-    return subTitle.map((subTitleItem: any) => {
+    return subTitle.map((subTitleItem: SubTitleInterface) => {
       return (
         <SubTitle key={`subTitle_${subTitleItem.id}`}>
           {subTitleItem.text}
@@ -244,7 +267,6 @@ function VideoUploadContainer() {
 
       if (!video?.isPlaying && typeof video?.currentTime !== "undefined") {
         videoRef.current.currentTime = video.currentTime;
-        videoRef.current.pause();
       }
     },
     [videoRef?.current, video?.isPlaying, video?.currentTime]
