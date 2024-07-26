@@ -32,16 +32,6 @@ function VideoUploadContainer() {
     setIsVideoLoad(false);
   };
 
-  const handleUploadVideoCurrentTime = () => {
-    const currentTime = videoRef.current?.currentTime ?? 0;
-    const duration = videoRef.current?.duration ?? 0;
-
-    if (currentTime >= duration) {
-      setIsPlaying(false);
-      setCurrentTime(0);
-    }
-  };
-
   const handleChangeMp4ToMp3 = async () => {
     const ffmpeg = createFFmpeg({
       corePath: "https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.js",
@@ -238,7 +228,6 @@ function VideoUploadContainer() {
           <div>
             <video
               loop={false}
-              onTimeUpdate={handleUploadVideoCurrentTime}
               ref={videoRef}
               className={styled.video}
               style={{
