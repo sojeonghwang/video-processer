@@ -123,7 +123,7 @@ function VideoUploadContainer() {
   //   });
   // };
 
-  const handleRemoveVidep = () => {
+  const handleRemoveVideo = () => {
     handleInitVideoState();
     initVideo();
   };
@@ -185,6 +185,37 @@ function VideoUploadContainer() {
     handleValidateSizeAndCount(files);
   };
 
+  const handleSubtitleDownload = () => {
+    const subTitleText = subTitle
+      .map((subTitleItem) => subTitleItem.text)
+      .join("\n");
+
+    const blob = new Blob([subTitleText], { type: "text/plain" });
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.style.display = "none";
+    a.href = url;
+    a.download = "subtitle.txt";
+    document.body.appendChild(a);
+
+    a.click();
+
+    setTimeout(() => {
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }, 100);
+  };
+
+  const handleChangeSubtitle = (
+    event: ChangeEvent<HTMLTextAreaElement>,
+    inputIndex: number
+  ) => {
+    const copiedSubtitle = [...subTitle];
+    copiedSubtitle[inputIndex].text = event.target.value;
+    setSubTitle(copiedSubtitle);
+  };
+
   const Preview = useMemo(() => {
     const isUploadPreviewShow = !isVideoLoad && !videoSrc;
     if (isUploadPreviewShow) {
@@ -217,10 +248,16 @@ function VideoUploadContainer() {
               src={videoSrc}
             />
             <InitButton
-              className={styled.delete_button}
-              onClick={handleRemoveVidep}
+              className={`${styled.video_button} ${styled.delete_button}`}
+              onClick={handleRemoveVideo}
             >
               비디오 삭제
+            </InitButton>
+            <InitButton
+              className={styled.video_button}
+              onClick={handleSubtitleDownload}
+            >
+              자막 텍스트 파일 다운로드
             </InitButton>
           </div>
         )}
@@ -232,13 +269,19 @@ function VideoUploadContainer() {
     handleValidateSizeVideoByDropEvent,
     videoSrc,
     handleCheckDuration,
+    handleRemoveVideo,
+    handleSubtitleDownload,
   ]);
 
   const SubTitleList = useMemo(() => {
-    return subTitle.map((subTitleItem: SubTitleInterface) => {
+    return subTitle.map((subTitleItem: SubTitleInterface, index) => {
       return (
         <SubTitle key={`subTitle_${subTitleItem.id}`}>
-          {subTitleItem.text}
+          <textarea
+            className={styled.sub_title_textarea}
+            value={subTitleItem?.text}
+            onChange={(event) => handleChangeSubtitle(event, index)}
+          />
         </SubTitle>
       );
     });
