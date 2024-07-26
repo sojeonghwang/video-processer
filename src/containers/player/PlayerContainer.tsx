@@ -98,16 +98,28 @@ function PlayerContainer() {
     duration: number;
   }) => {
     const currentTime = video?.currentTime ?? 0;
+
     const start = performance.now() - currentTime * 1000;
+
+    let startTime: number;
+    let startCurrentTime = video?.currentTime ?? 0;
     const animatationCallback = (time: number) => {
+      if (startTime === undefined) {
+        startTime = time;
+      }
+      const elapsed = time - startTime;
+      const curretTimeToMilliSecond = startCurrentTime * 1000;
+      const changedCurrentTime = (curretTimeToMilliSecond + elapsed) / 1000;
       const timeFraction = (time - start) / duration;
 
-      const progress = Math.pow(timeFraction, 2);
+      const progress = timeFraction;
       draw(progress);
 
       if (timeFraction < 1) {
         // 100% 안넘으면 재귀
         previousTimeRef.current = requestAnimationFrame(animatationCallback);
+
+        setCurrentTime(changedCurrentTime);
       } else {
         cancelAnimationFrame(previousTimeRef.current ?? 0);
       }

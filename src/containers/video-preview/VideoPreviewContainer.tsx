@@ -36,10 +36,9 @@ function VideoUploadContainer() {
     const currentTime = videoRef.current?.currentTime ?? 0;
     const duration = videoRef.current?.duration ?? 0;
 
-    setCurrentTime(currentTime);
-
     if (currentTime >= duration) {
       setIsPlaying(false);
+      setCurrentTime(0);
     }
   };
 
@@ -114,7 +113,6 @@ function VideoUploadContainer() {
   //     return;
   //   }
   //   ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-  //   console.log(canvas);
   //   canvas.toBlob((blob) => {
   //     if (!blob) {
   //       return;
