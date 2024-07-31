@@ -7,6 +7,7 @@ import styled from "./videoPreviewContainer.module.css";
 import Loading from "@/components/common/Loading";
 import videoStore from "@/hooks/store/video";
 import InitButton from "@/components/common/InitButton";
+import ConfirmPopup from "@/components/popup/ConfirmPopup";
 const { createFFmpeg, fetchFile } = require("@ffmpeg/ffmpeg");
 
 interface SubTitleInterface {
@@ -20,6 +21,8 @@ function VideoUploadContainer() {
   const [isVideoLoad, setIsVideoLoad] = useState<boolean>(false);
   const [videoSrc, setVideoSrc] = useState<null | string>(null);
   const [subTitle, setSubTitle] = useState<SubTitleInterface[]>([]);
+  const [summary, setSummary] = useState(null);
+  const [videoTitle, setVideoTitle] = useState<string>("");
   const videoRef = useRef<null | HTMLVideoElement>(null);
 
   const handleInitVideoState = () => {
@@ -157,6 +160,7 @@ function VideoUploadContainer() {
     }
 
     const videoUrl = URL.createObjectURL(file);
+
     setVideoSrc(videoUrl);
     setIsVideoLoad(true);
   };
@@ -173,6 +177,33 @@ function VideoUploadContainer() {
   ) => {
     const { files } = event.target;
     handleValidateSizeAndCount(files);
+  };
+
+  const handleCreateVideoSummary = async () => {
+    const content =
+      subTitle.map((subTitleItem) => subTitleItem.text).join(" ") ?? "";
+    if (videoTitle.length === 0) {
+      alert("비디오 제목을 입력해주세요.");
+      return;
+    }
+
+    const response = await fetch("/api/video-summary", {
+      method: "POST",
+      body: JSON.stringify({
+        title: videoTitle,
+        content,
+      }),
+    });
+    const { data } = await response.json();
+
+    if (!!data.error || !data.summary) {
+      alert(
+        data.error.message ??
+          "요약에 실패했습니다. 문구를 수정하여 다시 시도 해주세요."
+      );
+    }
+
+    setSummary(data.summary);
   };
 
   const handleSubtitleDownload = () => {
@@ -204,6 +235,10 @@ function VideoUploadContainer() {
     const copiedSubtitle = [...subTitle];
     copiedSubtitle[inputIndex].text = event.target.value;
     setSubTitle(copiedSubtitle);
+  };
+
+  const handleUploadVideoTitle = (event: ChangeEvent<HTMLInputElement>) => {
+    setVideoTitle(event.target.value);
   };
 
   const Preview = useMemo(() => {
@@ -248,6 +283,15 @@ function VideoUploadContainer() {
             >
               자막 텍스트 파일 다운로드
             </InitButton>
+            <InitButton
+              className={styled.video_button}
+              style={{
+                bottom: "60px",
+              }}
+              onClick={handleCreateVideoSummary}
+            >
+              비디오 요약하기
+            </InitButton>
           </div>
         )}
       </div>
@@ -262,6 +306,17 @@ function VideoUploadContainer() {
     handleSubtitleDownload,
   ]);
 
+  const VideoTitle = useMemo(() => {
+    return (
+      <input
+        value={videoTitle}
+        onChange={handleUploadVideoTitle}
+        className={styled.video_title}
+        placeholder="영상 내용의 제목을 입력해주세요."
+      />
+    );
+  }, [videoTitle, handleUploadVideoTitle]);
+
   const SubTitleList = useMemo(() => {
     return subTitle.map((subTitleItem: SubTitleInterface, index) => {
       return (
@@ -274,7 +329,7 @@ function VideoUploadContainer() {
         </SubTitle>
       );
     });
-  }, [subTitle]);
+  }, [subTitle, handleChangeSubtitle]);
 
   useEffect(
     function toggleVideoPlay() {
@@ -315,7 +370,14 @@ function VideoUploadContainer() {
 
   return (
     <>
+      {!!summary && (
+        <ConfirmPopup title="요약 결과" confirmAction={() => setSummary(null)}>
+          {summary}
+        </ConfirmPopup>
+      )}
+
       {Preview}
+      {VideoTitle}
       {SubTitleList}
     </>
   );

@@ -16,6 +16,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <div className={sytled.content}>{children}</div>
+        <div id="portal" />
       </body>
     </html>
   );

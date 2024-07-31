@@ -32,8 +32,8 @@ export async function POST(req: Request) {
       method: "POST",
       headers: {
         "Content-Type": "application/octet-stream",
-        "X-NCP-APIGW-API-KEY-ID": process.env.STT_CLIENT_ID,
-        "X-NCP-APIGW-API-KEY": process.env.STT_CLIENT_SECRET,
+        "X-NCP-APIGW-API-KEY-ID": process.env.CLIENT_ID,
+        "X-NCP-APIGW-API-KEY": process.env.CLIENT_SECRET,
       },
       body: fs.createReadStream(fileUrl),
       duplex: "half",
