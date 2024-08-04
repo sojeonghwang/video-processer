@@ -16,8 +16,7 @@ interface SubTitleInterface {
 }
 
 function VideoUploadContainer() {
-  const { video, setVideo, setCurrentTime, setIsPlaying, initVideo } =
-    videoStore();
+  const { video, setVideo, initVideo } = videoStore();
   const [isVideoLoad, setIsVideoLoad] = useState<boolean>(false);
   const [videoSrc, setVideoSrc] = useState<null | string>(null);
   const [subTitle, setSubTitle] = useState<SubTitleInterface[]>([]);
