@@ -60,6 +60,33 @@ function PlayerContainer() {
     setIsPlaying(true);
   };
 
+  const handleMoveToTimeByClickPosition = (
+    event: React.MouseEvent<HTMLDivElement>
+  ) => {
+    const { clientX } = event;
+    const width = (event.currentTarget as HTMLDivElement)?.clientWidth;
+
+    if (
+      typeof clientX === "undefined" ||
+      typeof width === "undefined" ||
+      typeof video?.duration === "undefined"
+    ) {
+      return;
+    }
+
+    // 백분율 계산
+    const clickPositionToPercent = (clientX * 100) / width;
+    const changedCurrentTime = (video.duration * clickPositionToPercent) / 100;
+
+    //재생중이면 정지 후 이동
+    if (video.isPlaying) {
+      setIsPlaying(false);
+    }
+
+    draw(clickPositionToPercent / 100);
+    setCurrentTime(changedCurrentTime);
+  };
+
   const PlayIcon = useMemo(() => {
     if (video?.isPlaying) {
       return (
@@ -164,7 +191,10 @@ function PlayerContainer() {
 
   return (
     <div className={styled.wrap}>
-      <div className={styled.duration_wrap}>
+      <div
+        className={styled.duration_wrap}
+        onClick={handleMoveToTimeByClickPosition}
+      >
         <span id="progress" className={styled.duration}></span>
       </div>
       <div className={styled.video_control}>
