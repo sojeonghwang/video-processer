@@ -10,16 +10,17 @@ import videoStore from "@/hooks/store/video";
 import { useEffect, useMemo, useRef } from "react";
 import { changeSecondToMinute } from "@/utils/time";
 
+const progressId = "progress";
 function PlayerContainer() {
   const { video, setCurrentTime, setMute, setIsPlaying } = videoStore();
   const previousTimeRef = useRef<number | null>(null);
 
   const draw = (progress: number) => {
-    if (!document.getElementById("progress")) {
+    if (!document.getElementById(progressId)) {
       return;
     }
     const progressElement = document.getElementById(
-      "progress"
+      progressId
     ) as HTMLSpanElement;
     progressElement.style.width = progress * 100 + "%";
   };
@@ -195,7 +196,7 @@ function PlayerContainer() {
         className={styled.duration_wrap}
         onClick={handleMoveToTimeByClickPosition}
       >
-        <span id="progress" className={styled.duration}></span>
+        <span id={progressId} className={styled.duration}></span>
       </div>
       <div className={styled.video_control}>
         {VideoPlayTime}
