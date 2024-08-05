@@ -14,6 +14,7 @@ const ProgressId = "progress";
 function PlayerContainer() {
   const { video, setCurrentTime, setMute, setIsPlaying } = videoStore();
   const previousTimeRef = useRef<number | null>(null);
+  console.log("TEST");
 
   const draw = (progress: number) => {
     if (!document.getElementById(ProgressId)) {
