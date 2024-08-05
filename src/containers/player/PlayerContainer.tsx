@@ -13,6 +13,7 @@ import { changeSecondToMinute } from "@/utils/time";
 function PlayerContainer() {
   const { video, setCurrentTime, setMute, setIsPlaying } = videoStore();
   const previousTimeRef = useRef<number | null>(null);
+  console.log("test");
 
   const draw = (progress: number) => {
     if (!document.getElementById("progress")) {
