@@ -9,6 +9,7 @@ url: https://video-processer.vercel.app/
 ### 미디어 처리 활용 라이브러리
 
 ffmpeg.wasm
+추후 비디오 재생 관련 라이브러리 완성 후 교체 예정 : https://github.com/sojeonghwang/video-player-js-sdk
 
 ### 배포
 
