@@ -5,9 +5,9 @@
  * Do NOT use SRI with dynamically generated files! More information: https://www.jsdelivr.com/using-sri-with-dynamic-files
  */
 @font-face {
-  font-family: "LINESeedKR-Bd";
-  src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_11-01@1.0/LINESeedKR-Bd.woff2")
-    format("woff2");
+  font-family: 'LINESeedKR-Bd';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_11-01@1.0/LINESeedKR-Bd.woff2')
+    format('woff2');
   font-weight: 700;
   font-style: normal;
 }
@@ -120,7 +120,7 @@ section {
 }
 body {
   line-height: 1;
-  font-family: "LINESeedKR-Bd";
+  font-family: 'LINESeedKR-Bd';
 }
 ol,
 ul {
@@ -134,7 +134,7 @@ blockquote:after,
 blockquote:before,
 q:after,
 q:before {
-  content: "";
+  content: '';
   content: none;
 }
 table {

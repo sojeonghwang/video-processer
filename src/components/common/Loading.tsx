@@ -1,4 +1,4 @@
-import styled from "./Loading.module.css";
+import styled from './Loading.module.css'
 
 function Loading() {
   return (
@@ -8,7 +8,7 @@ function Loading() {
       <div></div>
       <div></div>
     </div>
-  );
+  )
 }
 
-export default Loading;
+export default Loading

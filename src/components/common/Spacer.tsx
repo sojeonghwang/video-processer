@@ -1,5 +1,5 @@
 interface SpacerProps {
-  height: number;
+  height: number
 }
 
 function Spacer({ height }: SpacerProps) {
@@ -9,6 +9,6 @@ function Spacer({ height }: SpacerProps) {
         height: `${height}px`,
       }}
     ></div>
-  );
+  )
 }
-export default Spacer;
+export default Spacer

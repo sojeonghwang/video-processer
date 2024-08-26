@@ -1,9 +1,9 @@
-import { PropsWithChildren } from "react";
-import styled from "@/components/box/RoundBox.module.css";
+import { PropsWithChildren } from 'react'
+import styled from '@/components/box/RoundBox.module.css'
 
 interface RoundBoxProps extends PropsWithChildren {
-  bgColor?: string;
-  marign?: string;
+  bgColor?: string
+  marign?: string
 }
 
 function RoundBox({ bgColor, marign, children, ...props }: RoundBoxProps) {
@@ -11,14 +11,14 @@ function RoundBox({ bgColor, marign, children, ...props }: RoundBoxProps) {
     <div
       className={styled.wrap}
       style={{
-        background: bgColor ?? "#FFF",
-        margin: marign ?? "0",
+        background: bgColor ?? '#FFF',
+        margin: marign ?? '0',
       }}
       {...props}
     >
       {children}
     </div>
-  );
+  )
 }
 
-export default RoundBox;
+export default RoundBox

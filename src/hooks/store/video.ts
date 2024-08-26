@@ -1,22 +1,22 @@
-import { create } from "zustand";
+import { create } from 'zustand'
 
 export interface VideoStateInterface {
-  duration: number;
-  currentTime: number;
-  isPlaying: boolean;
-  isMute: boolean;
+  duration: number
+  currentTime: number
+  isPlaying: boolean
+  isMute: boolean
 }
 
 interface VideoState {
-  video: VideoStateInterface | null;
+  video: VideoStateInterface | null
 }
 
 interface VideoAction {
-  setVideo: (video: VideoStateInterface) => void;
-  initVideo: () => void;
-  setMute: (isMute: boolean) => void;
-  setCurrentTime: (currentTime: number) => void;
-  setIsPlaying: (isPlaying: boolean) => void;
+  setVideo: (video: VideoStateInterface) => void
+  initVideo: () => void
+  setMute: (isMute: boolean) => void
+  setCurrentTime: (currentTime: number) => void
+  setIsPlaying: (isPlaying: boolean) => void
 }
 
 const videoStore = create<VideoState & VideoAction>((set) => ({
@@ -25,15 +25,15 @@ const videoStore = create<VideoState & VideoAction>((set) => ({
     set(() => {
       return {
         video,
-      };
-    });
+      }
+    })
   },
   initVideo: () => {
     set(() => {
       return {
         video: null,
-      };
-    });
+      }
+    })
   },
   setMute: (isMute: boolean) => {
     set((state) => {
@@ -41,7 +41,7 @@ const videoStore = create<VideoState & VideoAction>((set) => ({
         currentTime = 0,
         duration = 0,
         isPlaying = false,
-      } = state.video ?? {};
+      } = state.video ?? {}
       return {
         video: {
           duration,
@@ -49,8 +49,8 @@ const videoStore = create<VideoState & VideoAction>((set) => ({
           isPlaying,
           isMute,
         },
-      };
-    });
+      }
+    })
   },
   setCurrentTime: (currentTime: number) => {
     set((state) => {
@@ -58,7 +58,7 @@ const videoStore = create<VideoState & VideoAction>((set) => ({
         isMute = false,
         duration = 0,
         isPlaying = false,
-      } = state.video ?? {};
+      } = state.video ?? {}
       return {
         video: {
           duration,
@@ -66,8 +66,8 @@ const videoStore = create<VideoState & VideoAction>((set) => ({
           isPlaying,
           isMute,
         },
-      };
-    });
+      }
+    })
   },
   setIsPlaying: (isPlaying: boolean) => {
     set((state) => {
@@ -75,12 +75,12 @@ const videoStore = create<VideoState & VideoAction>((set) => ({
         isMute = false,
         duration = 0,
         currentTime = 0,
-      } = state.video ?? {};
+      } = state.video ?? {}
 
-      let videoCurrentTime = currentTime;
+      let videoCurrentTime = currentTime
 
       if (currentTime >= duration) {
-        videoCurrentTime = 0;
+        videoCurrentTime = 0
       }
 
       return {
@@ -90,9 +90,9 @@ const videoStore = create<VideoState & VideoAction>((set) => ({
           isPlaying,
           isMute,
         },
-      };
-    });
+      }
+    })
   },
-}));
+}))
 
-export default videoStore;
+export default videoStore
