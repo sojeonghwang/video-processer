@@ -1,7 +1,7 @@
 export const VIDEO_VALIDATION = {
-  limitSize: 2 * 1024 * 1024, //2MB
-  limitSizeLabel: "2MB",
-  limitDuration: 60 * 1, //5분
-  limitDurationLabel: "1분",
+  limitSize: 4 * 1024 * 1024, //4MB
+  limitSizeLabel: "4MB",
+  limitDuration: 60 * 3,
+  limitDurationLabel: "3분",
   type: ["video/mp4", "video/mov", "video/quicktime"],
 };
