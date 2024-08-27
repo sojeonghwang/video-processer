@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useMemo, useState } from "react";
+import { ChangeEvent, useMemo, useRef, useState } from "react";
 import styled from "./VideoUploadBox.module.css";
 import { VIDEO_VALIDATION } from "@/constants/video";
 import { SttLanguage } from "@/constants/language";
@@ -19,10 +19,19 @@ function VideoUploadBox({
   selectedLanguage,
 }: VideoUploadBoxInterface) {
   const [isEnteredFile, setIsEnteredFile] = useState<boolean>(false);
+  const fileInput = useRef<HTMLInputElement | null>(null);
+  const handleRequireSelectedLanguage = () => {
+    if (!fileInput?.current) {
+      return;
+    }
+
+    fileInput.current.value = "";
+    alert("언어를 먼저 선택해주세요.");
+  };
 
   const handleDrop = (event: React.DragEvent<HTMLLabelElement>) => {
     if (selectedLanguage === null) {
-      alert("언어를 먼저 선택해주세요.");
+      handleRequireSelectedLanguage();
       return;
     }
     onDrop?.(event);
@@ -31,7 +40,7 @@ function VideoUploadBox({
 
   const handleUploadVideo = (event: ChangeEvent<HTMLInputElement>) => {
     if (selectedLanguage === null) {
-      alert("언어를 먼저 선택해주세요.");
+      handleRequireSelectedLanguage();
       return;
     }
     onChange?.(event);
@@ -93,6 +102,7 @@ function VideoUploadBox({
       >
         <span>
           <input
+            ref={fileInput}
             onChange={handleUploadVideo}
             className={styled.hide_input}
             id="upload"
