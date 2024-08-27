@@ -1,9 +1,9 @@
-export interface SttLanguageInterface {
+export interface SpeechToTextLanguageInterface {
   code: string;
   label: string;
 }
 
-export const SttLanguage: Record<string, SttLanguageInterface> = {
+export const SttLanguage: Record<string, SpeechToTextLanguageInterface> = {
   KO: {
     code: "ko-KR",
     label: "한국어",
@@ -18,6 +18,6 @@ export const SttLanguage: Record<string, SttLanguageInterface> = {
   },
   CN: {
     code: "zh-cn",
-    label: "中国人",
+    label: "中文",
   },
 } as const;

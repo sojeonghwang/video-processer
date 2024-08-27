@@ -12,9 +12,8 @@ export async function POST(req: Request) {
   });
 
   const result = await res.json();
-  console.log(result);
 
-  if (result.message === "Succeeded") {
+  if (!!result && result.message === "Succeeded") {
     return Response.json({ data: result.segments });
   }
 
