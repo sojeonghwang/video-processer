@@ -22,6 +22,7 @@ function VideoUploadContainer() {
   const [subTitle, setSubTitle] = useState<SubTitleInterface[]>([]);
   const [summary, setSummary] = useState(null);
   const [videoTitle, setVideoTitle] = useState<string>("");
+  const [selectedLanguage, setSelectedLanguage] = useState<null | string>(null);
   const videoRef = useRef<null | HTMLVideoElement>(null);
 
   const handleInitVideoState = () => {
@@ -29,31 +30,36 @@ function VideoUploadContainer() {
       //url 메모리 제거
       URL.revokeObjectURL(videoSrc);
     }
+    setSelectedLanguage(null);
     setSubTitle([]);
     setVideoSrc(null);
     setIsVideoLoad(false);
   };
 
   const handleChangeMp4ToMp3 = async () => {
-    const ffmpeg = createFFmpeg({
-      corePath: "https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.js",
-      log: true,
-    });
+    try {
+      const ffmpeg = createFFmpeg({
+        corePath: "https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.js",
+        log: false,
+      });
 
-    await ffmpeg.load();
-    ffmpeg.FS("writeFile", "test.mp4", await fetchFile(videoSrc));
-    await ffmpeg.run("-i", "test.mp4", "my.mp3");
-    const mp3File = ffmpeg.FS("readFile", "my.mp3");
-    const mp3Blob = new Blob([mp3File.buffer], { type: "audio/mp3" });
-    const file = new File([mp3Blob], "my.mp3", {
-      lastModified: new Date().getTime(),
-      type: "audio/mp3",
-    });
+      await ffmpeg.load();
+      ffmpeg.FS("writeFile", "test.mp4", await fetchFile(videoSrc));
+      await ffmpeg.run("-i", "test.mp4", "my.mp3");
+      const mp3File = ffmpeg.FS("readFile", "my.mp3");
+      const mp3Blob = new Blob([mp3File.buffer], { type: "audio/mp3" });
+      const file = new File([mp3Blob], "my.mp3", {
+        lastModified: new Date().getTime(),
+        type: "audio/mp3",
+      });
 
-    handleUploadMp3(file);
+      handleUploadMultiLanguageMp3(file);
+    } catch (exception) {
+      console.error("exception", exception);
+    }
   };
 
-  const handleUploadMp3 = async (audioFile: File) => {
+  const handleUploadMultiLanguageMp3 = async (audioFile: File) => {
     try {
       if (!audioFile) {
         handleInitVideoState();
@@ -62,16 +68,35 @@ function VideoUploadContainer() {
       }
 
       const formData = new FormData();
-      formData.append("file", audioFile);
+      formData.append("media", audioFile);
+      formData.append(
+        "params",
+        JSON.stringify({ language: selectedLanguage, completion: "sync" })
+      );
 
-      const response = await fetch("/api/video-processor", {
+      const response = await fetch("/api/video-multi-language-stt", {
         method: "POST",
         body: formData,
       });
-      const data = await response.json();
 
-      if (!!data?.data?.length) {
-        setSubTitle(data.data);
+      if (!response.ok) {
+        handleInitVideoState();
+        alert("서버와 통신에 실패했습니다.");
+        return;
+      }
+
+      const data = await response.json();
+      if (data?.data?.length > 0) {
+        const subTitleList = data.data.map(
+          (sttItem: { text: string; start: number }) => {
+            return {
+              text: sttItem.text,
+              id: sttItem.start,
+            };
+          }
+        );
+
+        setSubTitle(subTitleList);
         setIsVideoLoad(false);
 
         setVideo({
@@ -80,11 +105,14 @@ function VideoUploadContainer() {
           isPlaying: false,
           isMute: false,
         });
+      } else {
+        handleInitVideoState();
+        alert("인식된 자막이 없습니다. 언어를 변경해보세요.");
       }
     } catch (exception) {
       handleInitVideoState();
       alert("서버와 통신에 실패했습니다.");
-      console.error(`[handleUploadMp3] - ${exception}`);
+      console.error(`[handleUploadMultiLanguageMp3] - ${exception}`);
     }
   };
 
@@ -246,7 +274,9 @@ function VideoUploadContainer() {
       return (
         <VideoUploadBox
           onChange={handleValidateSizeVideoByChangeEvent}
+          onChangeLanguage={setSelectedLanguage}
           onDrop={handleValidateSizeVideoByDropEvent}
+          selectedLanguage={selectedLanguage}
         />
       );
     }
@@ -303,6 +333,7 @@ function VideoUploadContainer() {
     handleCheckDuration,
     handleRemoveVideo,
     handleSubtitleDownload,
+    selectedLanguage,
   ]);
 
   const VideoTitle = useMemo(() => {
