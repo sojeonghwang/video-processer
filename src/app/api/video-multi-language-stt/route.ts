@@ -1,4 +1,4 @@
-export const maxDuration = 70;
+export const maxDuration = 60;
 
 export async function POST(req: Request) {
   const formData = await req.formData();
