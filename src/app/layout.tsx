@@ -7,8 +7,7 @@ export const metadata: Metadata = {
   title: "비디오 자막 추출",
   description: "비디오의 자막 추출 사이트 입니다.",
   verification: {
-    google:
-      "google-site-verification=n0RL4qu61jFMLgt73pEtMbAja0xezkHWx0vU9gkyy3o",
+    google: "XbXaD6NHHzRT94Irir5A5GI7xR7sK_JUFhrveQj5-tc",
   },
 };
 
