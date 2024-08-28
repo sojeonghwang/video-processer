@@ -8,6 +8,7 @@ import Loading from "@/components/common/Loading";
 import videoStore from "@/hooks/store/video";
 import InitButton from "@/components/common/InitButton";
 import ConfirmPopup from "@/components/popup/ConfirmPopup";
+import { TranslationLanguage } from "@/constants/language";
 const { createFFmpeg, fetchFile } = require("@ffmpeg/ffmpeg");
 
 interface SubTitleInterface {
@@ -24,6 +25,8 @@ function VideoUploadContainer() {
   const [videoTitle, setVideoTitle] = useState<string>("");
   const [selectedLanguage, setSelectedLanguage] = useState<null | string>(null);
   const videoRef = useRef<null | HTMLVideoElement>(null);
+  const sourceElement = useRef<HTMLSelectElement | null>(null);
+  const targetElement = useRef<HTMLSelectElement | null>(null);
 
   const handleInitVideoState = () => {
     if (!!videoSrc) {
@@ -268,6 +271,51 @@ function VideoUploadContainer() {
     setVideoTitle(event.target.value);
   };
 
+  const handleTranslator = async () => {
+    try {
+      const source = sourceElement?.current?.value;
+      const target = targetElement?.current?.value;
+      if (!source || !target) {
+        alert("번역할 언어를 선택해주세요.");
+        return;
+      }
+      const textList = subTitle.map((item) => item.text).join("_");
+      const response = await fetch("/api/translator", {
+        method: "POST",
+        body: JSON.stringify({
+          prompt: textList,
+          source,
+          target,
+        }),
+      });
+
+      if (!response.ok) {
+        alert("번역에 실패했습니다.");
+        return;
+      }
+      const {
+        data: {
+          message: {
+            result: { translatedText },
+          },
+        },
+      } = await response.json();
+
+      const tranlatorSubTitle = translatedText
+        .split("_")
+        .map((text: string, index: number) => {
+          return {
+            text,
+            id: subTitle[index].id ?? Math.random(),
+          };
+        });
+      setSubTitle(tranlatorSubTitle);
+    } catch (exception) {
+      alert("번역에 실패했습니다.");
+      console.error(`[handleTranslator] - ${exception}`);
+    }
+  };
+
   const Preview = useMemo(() => {
     const isUploadPreviewShow = !isVideoLoad && !videoSrc;
     if (isUploadPreviewShow) {
@@ -280,7 +328,6 @@ function VideoUploadContainer() {
         />
       );
     }
-
     return (
       <div className={styled.wrap}>
         {isVideoLoad && (
@@ -326,6 +373,7 @@ function VideoUploadContainer() {
       </div>
     );
   }, [
+    video,
     isVideoLoad,
     handleValidateSizeVideoByChangeEvent,
     handleValidateSizeVideoByDropEvent,
@@ -336,6 +384,7 @@ function VideoUploadContainer() {
     selectedLanguage,
   ]);
 
+  //@todo 요약 API 한도 올리면 추가
   const VideoTitle = useMemo(() => {
     return (
       <input
@@ -348,17 +397,54 @@ function VideoUploadContainer() {
   }, [videoTitle, handleUploadVideoTitle]);
 
   const SubTitleList = useMemo(() => {
-    return subTitle.map((subTitleItem: SubTitleInterface, index) => {
-      return (
-        <SubTitle key={`subTitle_${subTitleItem.id}`}>
-          <textarea
-            className={styled.sub_title_textarea}
-            value={subTitleItem?.text}
-            onChange={(event) => handleChangeSubtitle(event, index)}
-          />
-        </SubTitle>
-      );
-    });
+    if (!subTitle?.length) {
+      return <></>;
+    }
+
+    return (
+      <div>
+        <div className={styled.translator_wrap}>
+          <select className={styled.translator_select} ref={sourceElement}>
+            {Object.keys(TranslationLanguage).map((key) => {
+              const lang = TranslationLanguage[key];
+              return (
+                <option key={`source_${lang.code}`} value={lang.code}>
+                  {lang.label}
+                </option>
+              );
+            })}
+          </select>{" "}
+          -&gt;
+          <select className={styled.translator_select} ref={targetElement}>
+            {Object.keys(TranslationLanguage).map((key) => {
+              const lang = TranslationLanguage[key];
+              return (
+                <option key={`target_${lang.code}`} value={lang.code}>
+                  {lang.label}
+                </option>
+              );
+            })}
+          </select>
+          <button
+            className={styled.translator_button}
+            onClick={handleTranslator}
+          >
+            번역
+          </button>
+        </div>
+        {subTitle.map((subTitleItem: SubTitleInterface, index) => {
+          return (
+            <SubTitle key={`subTitle_${subTitleItem.id}`}>
+              <textarea
+                className={styled.sub_title_textarea}
+                value={subTitleItem?.text}
+                onChange={(event) => handleChangeSubtitle(event, index)}
+              />
+            </SubTitle>
+          );
+        })}
+      </div>
+    );
   }, [subTitle, handleChangeSubtitle]);
 
   useEffect(
@@ -407,7 +493,7 @@ function VideoUploadContainer() {
       )}
 
       {Preview}
-      {VideoTitle}
+      {/* {VideoTitle} */}
       {SubTitleList}
     </>
   );

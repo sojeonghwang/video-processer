@@ -49,3 +49,24 @@
   border: 1px #f8f8f8 solid;
   border-radius: 5px;
 }
+
+.translator_button {
+  background: rgb(182, 231, 123);
+  border-radius: 5px;
+  padding: 5px 10px;
+  color: white;
+  border: none;
+}
+
+.translator_select {
+  border: rgb(182, 231, 123) 1px solid;
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+.translator_wrap {
+  display: flex;
+  margin: 10px 0;
+  align-items: center;
+  gap: 10px;
+}
