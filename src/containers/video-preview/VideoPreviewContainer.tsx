@@ -9,15 +9,17 @@ import videoStore from "@/hooks/store/video";
 import InitButton from "@/components/common/InitButton";
 import ConfirmPopup from "@/components/popup/ConfirmPopup";
 import { TranslationLanguage } from "@/constants/language";
+import useTranslator from "@/hooks/useTranslatorReqeust";
 const { createFFmpeg, fetchFile } = require("@ffmpeg/ffmpeg");
 
-interface SubTitleInterface {
+export interface SubTitleInterface {
   text: string;
   id: number;
 }
 
 function VideoUploadContainer() {
   const { video, setVideo, initVideo } = videoStore();
+  const { isLoading, requestTranslator } = useTranslator();
   const [isVideoLoad, setIsVideoLoad] = useState<boolean>(false);
   const [videoSrc, setVideoSrc] = useState<null | string>(null);
   const [subTitle, setSubTitle] = useState<SubTitleInterface[]>([]);
@@ -273,36 +275,18 @@ function VideoUploadContainer() {
 
   const handleTranslator = async () => {
     try {
-      const source = sourceElement?.current?.value;
-      const target = targetElement?.current?.value;
-      if (!source || !target) {
-        alert("번역할 언어를 선택해주세요.");
-        return;
-      }
       const textList = subTitle.map((item) => item.text).join("_");
-      const response = await fetch("/api/translator", {
-        method: "POST",
-        body: JSON.stringify({
-          prompt: textList,
-          source,
-          target,
-        }),
-      });
 
-      if (!response.ok) {
-        alert("번역에 실패했습니다.");
+      const data = await requestTranslator(
+        sourceElement?.current?.value ?? "",
+        targetElement?.current?.value ?? "",
+        textList
+      );
+      if (!data) {
         return;
       }
-      const {
-        data: {
-          message: {
-            result: { translatedText },
-          },
-        },
-      } = await response.json();
-
-      const tranlatorSubTitle = translatedText
-        .split("_")
+      const tranlatorSubTitle = data
+        ?.split("_")
         .map((text: string, index: number) => {
           return {
             text,
@@ -311,8 +295,7 @@ function VideoUploadContainer() {
         });
       setSubTitle(tranlatorSubTitle);
     } catch (exception) {
-      alert("번역에 실패했습니다.");
-      console.error(`[handleTranslator] - ${exception}`);
+      console.error(exception);
     }
   };
 
@@ -359,7 +342,7 @@ function VideoUploadContainer() {
             >
               자막 텍스트 파일 다운로드
             </InitButton>
-            <InitButton
+            {/* <InitButton
               className={styled.video_button}
               style={{
                 bottom: "60px",
@@ -367,7 +350,7 @@ function VideoUploadContainer() {
               onClick={handleCreateVideoSummary}
             >
               비디오 요약하기
-            </InitButton>
+            </InitButton> */}
           </div>
         )}
       </div>
@@ -427,9 +410,9 @@ function VideoUploadContainer() {
           </select>
           <button
             className={styled.translator_button}
-            onClick={handleTranslator}
+            onClick={isLoading ? () => {} : handleTranslator}
           >
-            번역
+            {isLoading ? <Loading /> : "번역"}
           </button>
         </div>
         {subTitle.map((subTitleItem: SubTitleInterface, index) => {
@@ -445,7 +428,7 @@ function VideoUploadContainer() {
         })}
       </div>
     );
-  }, [subTitle, handleChangeSubtitle]);
+  }, [subTitle, handleChangeSubtitle, isLoading]);
 
   useEffect(
     function toggleVideoPlay() {
