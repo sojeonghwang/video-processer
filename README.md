@@ -14,3 +14,6 @@ ffmpeg.wasm
 ### 배포
 
 Vercel
+
+### 화면
+![스크린샷 2024-08-28 오후 12 26 58](https://github.com/user-attachments/assets/867dfe3f-d503-44af-9211-d609f1d7edb6)
