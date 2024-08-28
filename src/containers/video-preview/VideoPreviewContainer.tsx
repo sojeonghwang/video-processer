@@ -311,6 +311,7 @@ function VideoUploadContainer() {
         });
       setSubTitle(tranlatorSubTitle);
     } catch (exception) {
+      alert("번역에 실패했습니다.");
       console.error(`[handleTranslator] - ${exception}`);
     }
   };

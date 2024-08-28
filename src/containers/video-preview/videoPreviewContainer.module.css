@@ -51,7 +51,7 @@
 }
 
 .translator_button {
-  background: rgb(182 231 123);
+  background: rgb(182, 231, 123);
   border-radius: 5px;
   padding: 5px 10px;
   color: white;
@@ -59,7 +59,7 @@
 }
 
 .translator_select {
-  border: rgb(182 231 123) 1px solid;
+  border: rgb(182, 231, 123) 1px solid;
   border-radius: 5px;
   padding: 5px 10px;
 }
