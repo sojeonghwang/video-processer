@@ -10,7 +10,7 @@ import InitButton from "@/components/common/InitButton";
 import ConfirmPopup from "@/components/popup/ConfirmPopup";
 import { TranslationLanguage } from "@/constants/language";
 import useTranslator from "@/hooks/useTranslatorReqeust";
-const { createFFmpeg, fetchFile } = require("@ffmpeg/ffmpeg");
+import { changeMp4ToMp3 } from "@/utils/media";
 
 export interface SubTitleInterface {
   text: string;
@@ -43,23 +43,16 @@ function VideoUploadContainer() {
 
   const handleChangeMp4ToMp3 = async () => {
     try {
-      const ffmpeg = createFFmpeg({
-        corePath: "https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.js",
-        log: false,
-      });
-
-      await ffmpeg.load();
-      ffmpeg.FS("writeFile", "test.mp4", await fetchFile(videoSrc));
-      await ffmpeg.run("-i", "test.mp4", "my.mp3");
-      const mp3File = ffmpeg.FS("readFile", "my.mp3");
-      const mp3Blob = new Blob([mp3File.buffer], { type: "audio/mp3" });
-      const file = new File([mp3Blob], "my.mp3", {
-        lastModified: new Date().getTime(),
-        type: "audio/mp3",
-      });
-
+      const file = await changeMp4ToMp3(videoSrc as string);
+      if (!file) {
+        initVideo();
+        alert("파일 변환에 실패 했습니다.");
+        return;
+      }
       handleUploadMultiLanguageMp3(file);
     } catch (exception) {
+      initVideo();
+      alert("파일 변환에 실패 했습니다.");
       console.error("exception", exception);
     }
   };
@@ -342,7 +335,9 @@ function VideoUploadContainer() {
             >
               자막 텍스트 파일 다운로드
             </InitButton>
-            {/* <InitButton
+            {/*
+            @todo 요약 API 한도 올리면 추가
+            <InitButton
               className={styled.video_button}
               style={{
                 bottom: "60px",
