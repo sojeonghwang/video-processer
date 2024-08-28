@@ -4,3 +4,9 @@
   background: none;
   cursor: pointer;
 }
+
+.translator_select {
+  border: rgb(182, 231, 123) 1px solid;
+  border-radius: 5px;
+  padding: 5px 10px;
+}
