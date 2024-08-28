@@ -17,6 +17,11 @@ const subtitleStore = create<SubtitleState & SubtitleAction>((set) => ({
   subtitle: [],
   setSubtitle: (subtitle: SubtitleInterface[]) => {
     set(() => {
+      if (!subtitle) {
+        return {
+          subtitle: [],
+        };
+      }
       return {
         subtitle,
       };

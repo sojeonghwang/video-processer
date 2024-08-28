@@ -1,6 +1,6 @@
 "use client";
 import { TranslationLanguage } from "@/constants/language";
-import React, { LegacyRef } from "react";
+import React, { Ref } from "react";
 import styled from "./common.module.css";
 
 interface SelectBoxPropsInterface {
@@ -8,7 +8,7 @@ interface SelectBoxPropsInterface {
 }
 
 const SelectBox = React.forwardRef(
-  (props: SelectBoxPropsInterface, ref: LegacyRef<HTMLSelectElement>) => {
+  (props: SelectBoxPropsInterface, ref: Ref<HTMLSelectElement>) => {
     return (
       <select className={styled.translator_select} ref={ref}>
         {Object.keys(TranslationLanguage).map((key) => {
