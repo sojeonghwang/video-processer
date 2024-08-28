@@ -1,16 +1,21 @@
 "use client";
-import SubTitle from "@/components/subtitle/Subtitle";
 import VideoUploadBox from "@/components/upload/VideoUploadBox";
 import { VIDEO_VALIDATION } from "@/constants/video";
-import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  Fragment,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import styled from "./videoPreviewContainer.module.css";
 import Loading from "@/components/common/Loading";
 import videoStore from "@/hooks/store/video";
 import InitButton from "@/components/common/InitButton";
 import ConfirmPopup from "@/components/popup/ConfirmPopup";
-import { TranslationLanguage } from "@/constants/language";
-import useTranslator from "@/hooks/useTranslatorReqeust";
 import { changeMp4ToMp3 } from "@/utils/media";
+import subtitleStore from "@/hooks/store/subtitle";
 
 export interface SubTitleInterface {
   text: string;
@@ -19,16 +24,13 @@ export interface SubTitleInterface {
 
 function VideoUploadContainer() {
   const { video, setVideo, initVideo } = videoStore();
-  const { isLoading, requestTranslator } = useTranslator();
+  const { subtitle, setSubtitle } = subtitleStore();
   const [isVideoLoad, setIsVideoLoad] = useState<boolean>(false);
   const [videoSrc, setVideoSrc] = useState<null | string>(null);
-  const [subTitle, setSubTitle] = useState<SubTitleInterface[]>([]);
   const [summary, setSummary] = useState(null);
   const [videoTitle, setVideoTitle] = useState<string>("");
   const [selectedLanguage, setSelectedLanguage] = useState<null | string>(null);
   const videoRef = useRef<null | HTMLVideoElement>(null);
-  const sourceElement = useRef<HTMLSelectElement | null>(null);
-  const targetElement = useRef<HTMLSelectElement | null>(null);
 
   const handleInitVideoState = () => {
     if (!!videoSrc) {
@@ -36,7 +38,7 @@ function VideoUploadContainer() {
       URL.revokeObjectURL(videoSrc);
     }
     setSelectedLanguage(null);
-    setSubTitle([]);
+    setSubtitle([]);
     setVideoSrc(null);
     setIsVideoLoad(false);
   };
@@ -94,7 +96,7 @@ function VideoUploadContainer() {
           }
         );
 
-        setSubTitle(subTitleList);
+        setSubtitle(subTitleList);
         setIsVideoLoad(false);
 
         setVideo({
@@ -206,7 +208,7 @@ function VideoUploadContainer() {
 
   const handleCreateVideoSummary = async () => {
     const content =
-      subTitle.map((subTitleItem) => subTitleItem.text).join(" ") ?? "";
+      subtitle.map((subTitleItem) => subTitleItem.text).join(" ") ?? "";
     if (videoTitle.length === 0) {
       alert("비디오 제목을 입력해주세요.");
       return;
@@ -232,7 +234,7 @@ function VideoUploadContainer() {
   };
 
   const handleSubtitleDownload = () => {
-    const subTitleText = subTitle
+    const subTitleText = subtitle
       .map((subTitleItem) => subTitleItem.text)
       .join("\n");
 
@@ -253,43 +255,8 @@ function VideoUploadContainer() {
     }, 100);
   };
 
-  const handleChangeSubtitle = (
-    event: ChangeEvent<HTMLTextAreaElement>,
-    inputIndex: number
-  ) => {
-    const copiedSubtitle = [...subTitle];
-    copiedSubtitle[inputIndex].text = event.target.value;
-    setSubTitle(copiedSubtitle);
-  };
-
   const handleUploadVideoTitle = (event: ChangeEvent<HTMLInputElement>) => {
     setVideoTitle(event.target.value);
-  };
-
-  const handleTranslator = async () => {
-    try {
-      const textList = subTitle.map((item) => item.text).join("_");
-
-      const data = await requestTranslator(
-        sourceElement?.current?.value ?? "",
-        targetElement?.current?.value ?? "",
-        textList
-      );
-      if (!data) {
-        return;
-      }
-      const tranlatorSubTitle = data
-        ?.split("_")
-        .map((text: string, index: number) => {
-          return {
-            text,
-            id: subTitle[index].id ?? Math.random(),
-          };
-        });
-      setSubTitle(tranlatorSubTitle);
-    } catch (exception) {
-      console.error(exception);
-    }
   };
 
   const Preview = useMemo(() => {
@@ -374,57 +341,6 @@ function VideoUploadContainer() {
     );
   }, [videoTitle, handleUploadVideoTitle]);
 
-  const SubTitleList = useMemo(() => {
-    if (!subTitle?.length) {
-      return <></>;
-    }
-
-    return (
-      <div>
-        <div className={styled.translator_wrap}>
-          <select className={styled.translator_select} ref={sourceElement}>
-            {Object.keys(TranslationLanguage).map((key) => {
-              const lang = TranslationLanguage[key];
-              return (
-                <option key={`source_${lang.code}`} value={lang.code}>
-                  {lang.label}
-                </option>
-              );
-            })}
-          </select>{" "}
-          -&gt;
-          <select className={styled.translator_select} ref={targetElement}>
-            {Object.keys(TranslationLanguage).map((key) => {
-              const lang = TranslationLanguage[key];
-              return (
-                <option key={`target_${lang.code}`} value={lang.code}>
-                  {lang.label}
-                </option>
-              );
-            })}
-          </select>
-          <button
-            className={styled.translator_button}
-            onClick={isLoading ? () => {} : handleTranslator}
-          >
-            {isLoading ? <Loading /> : "번역"}
-          </button>
-        </div>
-        {subTitle.map((subTitleItem: SubTitleInterface, index) => {
-          return (
-            <SubTitle key={`subTitle_${subTitleItem.id}`}>
-              <textarea
-                className={styled.sub_title_textarea}
-                value={subTitleItem?.text}
-                onChange={(event) => handleChangeSubtitle(event, index)}
-              />
-            </SubTitle>
-          );
-        })}
-      </div>
-    );
-  }, [subTitle, handleChangeSubtitle, isLoading]);
-
   useEffect(
     function toggleVideoPlay() {
       if (!videoRef.current) {
@@ -463,7 +379,7 @@ function VideoUploadContainer() {
   );
 
   return (
-    <>
+    <Fragment>
       {!!summary && (
         <ConfirmPopup title="요약 결과" confirmAction={() => setSummary(null)}>
           {summary}
@@ -472,8 +388,7 @@ function VideoUploadContainer() {
 
       {Preview}
       {/* {VideoTitle} */}
-      {SubTitleList}
-    </>
+    </Fragment>
   );
 }
 
