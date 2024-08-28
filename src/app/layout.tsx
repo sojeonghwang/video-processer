@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import sytled from "./page.module.css";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   title: "비디오 자막 추출",
@@ -17,6 +18,7 @@ export default function RootLayout({
       <body>
         <div className={sytled.content}>{children}</div>
         <div id="portal" />
+        <Analytics />
       </body>
     </html>
   );
